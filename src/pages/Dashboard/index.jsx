@@ -1,8 +1,16 @@
-import React, { useRef } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import React, { useEffect, useRef } from 'react'
+import { useSelector } from 'react-redux';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 
 function Dashboard() {
     const drawerRef = useRef(null);
+    const userState = useSelector(state=>state.user);
+    const navigate = useNavigate();
+    useEffect(()=>{
+        if( userState.data === null){
+            navigate("/login");
+        }
+    }, [])
     return (
         <div className="flex justify-center items-center flex-col">
             <div className="navbar bg-base-100 max-w-7xl sticky top-0 z-50">

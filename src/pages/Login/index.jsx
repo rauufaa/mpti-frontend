@@ -35,10 +35,8 @@ function Login() {
         console.log(userState.login.username, userState.login.password)
 
         dispatch(loginUser(prepData)).then(result => {
-            // console.log(result)
-            if (result.payload) {
+            if (!result.error) {
                 navigate("/")
-                return
             }
         })
     }
@@ -51,6 +49,12 @@ function Login() {
         }, 5000)
         return () => clearTimeout(timer)
     }, [userState.error])
+
+    useEffect(()=>{
+        if( userState.data ){
+            navigate("/");
+        }
+    }, [])
 
     return (
         <div className="bg-gray-50">

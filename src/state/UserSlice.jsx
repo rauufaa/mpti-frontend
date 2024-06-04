@@ -40,7 +40,7 @@ const UserSlice = createSlice({
             password: null
         },
 
-        data: JSON.parse(localStorage.getItem("user"))
+        data: JSON.parse(localStorage.getItem("user")) || null
     },
     reducers: {
         updateUsernameUser: (state, action) => {

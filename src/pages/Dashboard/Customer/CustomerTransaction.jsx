@@ -1,6 +1,11 @@
-import { Form, Link } from "react-router-dom"
+import { useDispatch, useSelector } from "react-redux";
+import { Form, Link, useNavigate } from "react-router-dom"
 
 function CustomerTransaction() {
+    const userState = useSelector(state => state.user);
+    const customerState = useSelector(state => state.customer);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     return (
         <div className="w-full py-2">
             <div className="flex justify-start">
@@ -33,17 +38,17 @@ function CustomerTransaction() {
                         <div >
                             <div className="grid grid-cols-2">
                                 <p>NIK</p>
-                                <p className="truncate">1810021306030001</p>
+                                <p className="truncate">{customerState.data.nik}</p>
                             </div>
                             <hr className="my-2 border border-blue-gray-50" />
                             <div className="grid grid-cols-2">
                                 <p>Nama</p>
-                                <p>Rauuf Anugerah Akbar</p>
+                                <p>{customerState.data.nama}</p>
                             </div>
                             <hr className="my-2 border border-blue-gray-50" />
                             <div className="grid grid-cols-2">
                                 <p>Jenis Subsidi</p>
-                                <p>Rumah Tangga</p>
+                                <p>{customerState.data.tipe}</p>
                             </div>
                             <hr className="my-2 border border-blue-gray-50" />
 
@@ -78,7 +83,7 @@ function CustomerTransaction() {
                     </div>
                 </div>
 
-                <button className="btn  place-self-center my-3">Daftarkan Pelanggan</button>
+                <button className="btn  place-self-center my-3">Melakukan Pembelian</button>
             </Form>
         </div>
     )
