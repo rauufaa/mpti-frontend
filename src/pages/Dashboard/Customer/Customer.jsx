@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Form, Link, useNavigate } from "react-router-dom"
-import { customerCheckNik, updateErrorCustomer, updateMessageCustomer, updateNik } from "../../../state/CustomerSlice";
+import { customerCheckNik, updateErrorCustomer, updateMessageCustomer, updateNikCustomer } from "../../../state/CustomerSlice";
 import { useEffect } from "react";
 
 function Customer() {
@@ -10,7 +10,7 @@ function Customer() {
     const navigate = useNavigate();
     const handleNikInputChange = (event) => {
         event.target.value = event.target.value.replace(/[^0-9]/g, '');
-        dispatch(updateNik(event.target.value))
+        dispatch(updateNikCustomer(event.target.value))
     }
 
     const handleNikSubmit = (event) => {
@@ -61,7 +61,7 @@ function Customer() {
                             )
                         }
                         <label className="input my-3 truncate border-none flex items-center gap-2 before:bg-black relative before:absolute before:w-full before:h-0.5 before:bottom-0 before:left-0">
-                            <input onChange={handleNikInputChange} type="text" className="w-full" placeholder="Masukkan 16 digit NIK KTP Pelanggan" required />
+                            <input defaultValue={customerState.data.nik} onChange={handleNikInputChange} type="text" className="w-full" placeholder="Masukkan 16 digit NIK KTP Pelanggan" required />
                         </label>
                         <div className="card-actions justify-center">
                             <button type="submit" className="btn rounded-full w-full">Cek</button>

@@ -1,6 +1,8 @@
+import { useSelector } from "react-redux"
 import { Form, Link } from "react-router-dom"
 
 function Stok() {
+    const stokState = useSelector(state=>state.stok)
     return (
         <div className="w-full py-2">
             <div className="flex justify-between items-center">
@@ -20,14 +22,14 @@ function Stok() {
                         </div>
 
                     </div>
-                    <span class="material-symbols-outlined">
+                    <span className="material-symbols-outlined">
                         arrow_forward_ios
                     </span>
                 </Link>
-                <Link to="/stok/riwayat" className="btn justify-between px-8 py-6 h-auto max-w-5xl bg-base-100 shadow-xl">
+                <Link to="/stok/riwayat" className="btn justify-between px-8 py-6 h-auto max-w-5xl bg-base-100 shadow-xl" disabled={stokState.loading}>
                     <h2 className="card-title">Riwayat Stok</h2>
 
-                    <span class="material-symbols-outlined">
+                    <span className="material-symbols-outlined">
                         arrow_forward_ios
                     </span>
                 </Link>

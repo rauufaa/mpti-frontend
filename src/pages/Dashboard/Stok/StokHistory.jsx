@@ -1,6 +1,106 @@
-import { Form, Link } from "react-router-dom"
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Form, Link, useNavigate } from "react-router-dom"
+import { downloadHistoryStok, historyStok, updateCurrentPageStok, updateEndDateStok, updateStartDateStok, updateSuccessStok } from "../../../state/StokSlice";
+import FileSaver from 'file-saver';
+import * as XLSX from 'xlsx';
+
 
 function StokHistory() {
+    const stokState = useSelector(state => state.stok);
+    const userState = useSelector(state => state.user);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleStartDateInputChange = (event) => {
+        dispatch(updateStartDateStok(event.target.value))
+        console.log(event.target.value)
+    }
+
+    const handleEndDateInputChange = (event) => {
+        dispatch(updateEndDateStok(event.target.value))
+        console.log("madeh", stokState.historyData.endDate, event.target.value)
+    }
+
+    const handleSubmitSearchHistory = (event) => {
+        event.preventDefault();
+        const dataPrep = {
+            token: userState.data.token,
+            currentPage: stokState.historyData?.currentPage,
+            startDate: stokState.historyData?.startDate,
+            endDate: stokState.historyData?.endDate
+        }
+        console.log(stokState.historyData.endDate)
+        dispatch(historyStok(dataPrep)).then(result => console.log(result))
+    }
+
+    const handleHistoryNextPage = (event) => {
+        dispatch(updateCurrentPageStok(stokState.historyData.currentPage + 1))
+        const dataPrep = {
+            token: userState.data.token,
+            currentPage: stokState.historyData.paging?.next,
+            startDate: stokState.historyData?.startDate,
+            endDate: stokState.historyData?.endDate
+        }
+        dispatch(historyStok(dataPrep)).then(result => console.log(result))
+    }
+
+    const handleHistoryPrevPage = (event) => {
+        dispatch(updateCurrentPageStok(stokState.historyData.currentPage - 1))
+        const dataPrep = {
+            token: userState.data.token,
+            currentPage: stokState.historyData.paging?.prev,
+            startDate: stokState.historyData?.startDate,
+            endDate: stokState.historyData?.endDate
+        }
+        dispatch(historyStok(dataPrep)).then(result => console.log(result))
+    }
+    console.log("kerender", stokState.historyData?.endDate)
+
+    useEffect(() => {
+        const dataPrep = {
+            token: userState.data.token,
+            currentPage: stokState.historyData?.currentPage,
+            startDate: stokState.historyData?.startDate,
+            endDate: stokState.historyData?.endDate
+        }
+        dispatch(historyStok(dataPrep))
+        console.log("pasti")
+    }, [])
+
+    const handleDonwloadHistory = (event) => {
+        const dataPrep = {
+            token: userState.data.token,
+            startDate: stokState.historyData.startDate,
+            endDate: stokState.historyData.endDate
+        }
+        console.log(stokState.historyData.endDate)
+        dispatch(downloadHistoryStok(dataPrep)).then(result => {
+            if (!result.error) {
+                excelExport(result.payload)
+            }
+        })
+        dispatch(historyStok(dataPrep))
+    }
+
+    const excelExport = (result) => {
+        // console.log([...stokState?.dataPrint.map((data, index)=>[index++, data.nama_penginput, data.nama_gas, data.jumlah, data.tanggal, data.informasi])])
+        //console.log(result)
+        const fileName = 'apidata';
+        const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+        const fileExtension = ".xlsx";
+        const Heading = [
+            ['yayayay'],
+            ['No', 'Penginput', 'Jenis Gas', 'Jumlah', 'Tanggal', 'Informasi']
+        ];
+        const ws = XLSX.utils.json_to_sheet(result.data.map((data, index)=>[index+1, data.nama_penginput, data.nama_gas, data.jumlah, data.tanggal, data.informasi]), { origin: 'A2'});
+        XLSX.utils.sheet_add_aoa(ws, Heading, { origin: 'A1' });
+        const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+        const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+        const filedata = new Blob([excelBuffer], { type: fileType });
+        FileSaver.saveAs(filedata, fileName + fileExtension);
+    }
+
     return (
         <div className="w-full py-2">
             <div className="flex justify-start">
@@ -14,25 +114,35 @@ function StokHistory() {
                     <p className="text-[1.2em]">Riwayat Perubahan Stok LPG 3Kg</p>
                 </div>
             </div>
-            <Form className="grid gap-3">
+            <div className="grid gap-3">
                 <div className="card bg-base-100 shadow-xl overflow-x-auto max-w-5xl ">
-                    <div className="card-body gap-4 flex-col md:flex-row">
-                        <div className="w-full">
-                            <h2 className="card-title">Dari Tanggal</h2>
-                            <input type="datetime-local" className="input input-bordered w-full" />
+                    <Form className="card-body gap-4 flex-col" onSubmit={handleSubmitSearchHistory}>
+
+                        <div className="flex md:flex-row flex-col gap-4">
+                            <div className="w-full">
+                                <h2 className="card-title">Dari Tanggal</h2>
+                                <input defaultValue={stokState.historyData?.startDate} onChange={handleStartDateInputChange} type="datetime-local" className="input input-bordered w-full" />
+                            </div>
+                            <div className="w-full">
+                                <h2 className="card-title">Sampai Tanggal</h2>
+                                <input defaultValue={stokState.historyData?.endDate} onChange={handleEndDateInputChange} type="datetime-local" className="input input-bordered w-full" />
+                            </div>
                         </div>
-                        <div className="w-full">
-                            <h2 className="card-title">Sampai Tanggal</h2>
-                            <input type="datetime-local" className="input input-bordered w-full" />
-                        </div>
-                    </div>
+                        <button type="submit" className="btn w-full" disabled={stokState?.loading}>
+                            {stokState.loading &&
+                                <span className="loading loading-spinner"></span>
+                            }
+                            Cari
+                        </button>
+
+                    </Form>
                 </div>
                 <div className="card max-w-5xl bg-base-100 shadow-xl overflow-x-auto">
                     <div className="card-body">
                         <div className="flex gap-4 justify-between flex-col sm:flex-row">
                             <h2 className="card-title">Riwayat</h2>
-                            <button className="btn">
-                                <span class="material-symbols-outlined">
+                            <button className="btn" onClick={handleDonwloadHistory}>
+                                <span className="material-symbols-outlined">
                                     download
                                 </span>
                                 Unduh
@@ -46,23 +156,40 @@ function StokHistory() {
                                         <th>Tanggal</th>
                                         <th>Jumlah</th>
                                         <th>Keterangan</th>
+                                        <th>Penginput</th>
                                         <th>Edit</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1</td>
-                                        <td>12/3/2024</td>
-                                        <td>100</td>
-                                        <td>Baru hangat</td>
-                                        <td>
-                                            <button className="btn btn-ghost btn-circle">
-                                                <span className="material-symbols-outlined">
-                                                    edit
-                                                </span>
-                                            </button>
-                                        </td>
-                                    </tr>
+                                <tbody className={stokState.loading ? "skeleton" : ""}>
+
+                                    {
+                                        stokState.error ? (
+                                            <tr><td colSpan={6} className="text-center">{stokState.message}</td></tr>
+                                        ) : (
+                                            stokState.historyData.list?.map((data, index) => {
+                                                const dataIndex = (5 * stokState.historyData.currentPage - ((5 - index - 1)))
+                                                return (
+                                                    <tr key={index}>
+                                                        <td>{dataIndex}</td>
+                                                        <td>{data.tanggal}</td>
+                                                        <td>{data.jumlah}</td>
+                                                        <td>{data.informasi}</td>
+                                                        <td>{data.nama_penginput}</td>
+                                                        <td>
+                                                            <button className="btn btn-ghost btn-circle">
+                                                                <span className="material-symbols-outlined">
+                                                                    edit
+                                                                </span>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                )
+                                            })
+                                        )
+                                    }
+
+
+
 
 
                                 </tbody>
@@ -71,16 +198,25 @@ function StokHistory() {
                         </div>
                         <div className="card-actions justify-center">
                             <div className="join">
-                                <button className="join-item btn">«</button>
-                                <button className="join-item btn">Page 22</button>
-                                <button className="join-item btn">»</button>
+                                {
+                                    stokState.historyData.paging?.prev &&
+                                    <button className="join-item btn" onClick={handleHistoryPrevPage}>«</button>
+                                }
+
+                                <button className="join-item btn">{stokState.historyData.currentPage}</button>
+
+                                {
+                                    stokState.historyData.paging?.next &&
+                                    <button className="join-item btn" onClick={handleHistoryNextPage}>»</button>
+                                }
+
                             </div>
                         </div>
 
                     </div>
 
                 </div>
-            </Form>
+            </div>
         </div>
     )
 }

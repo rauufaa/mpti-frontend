@@ -34,19 +34,41 @@ const CustomerSlice = createSlice({
         message: null,
         data: {
             nik: null,
-            nama: null,
-            tipe: null,
+            name: null,
+            address: null,
+            type: null,
+            ktp: {
+                ktpSource: null,
+                ktpName: null
+            },
+            inputDate: null,
         },
     },
     reducers: {
-        updateNik: (state, action)=>{
+        updateNikCustomer: (state, action)=>{
             state.data.nik = action.payload;
+        },
+        updateInputDateCustomer: (state, action)=>{
+            state.data.inputDate = action.payload;
         },
         updateErrorCustomer: (state, action)=> {
             state.error = action.payload
         },
         updateMessageCustomer: (state, action)=> {
             state.message = action.payload
+        },
+        updateNameCustomer: (state, action)=> {
+            state.data.namw = action.payload
+        },
+        updateAddressCustomer: (state, action)=> {
+            state.data.address = action.payload
+        },
+        updateTypeCustomer: (state, action)=> {
+            state.data.type = action.payload
+        },
+        updateKtpCustomer: (state, action)=> {
+            state.data.ktp.ktpSource = action.payload.ktpSource
+            state.data.ktp.ktpName = action.payload.ktpName
         }
     },
     extraReducers: builder => {
@@ -58,10 +80,10 @@ const CustomerSlice = createSlice({
             .addCase(customerCheckNik.fulfilled, (state, action) => {
                 state.loading = false
                 state.error = false
-                console.log(action)
-                state.data.nik = action.payload.data.nik
-                state.data.nama = action.payload.data.nama
-                state.data.tipe = action.payload.data.tipe
+                // console.log(action)
+                // state.data.nik = action.payload.data.nik
+                // state.data.name = action.payload.data.nama
+                // state.data.type = action.payload.data.tipe
             })
             .addCase(customerCheckNik.rejected, (state, action) => {
                 state.loading = false;
@@ -71,5 +93,5 @@ const CustomerSlice = createSlice({
     }
 })
 
-export const { updateNik, updateErrorCustomer, updateMessageCustomer } = CustomerSlice.actions
+export const { updateNikCustomer, updateKtpCustomer,updateNameCustomer, updateAddressCustomer, updateInputDateCustomer, updateErrorCustomer, updateMessageCustomer, updateTypeCustomer } = CustomerSlice.actions
 export default CustomerSlice.reducer

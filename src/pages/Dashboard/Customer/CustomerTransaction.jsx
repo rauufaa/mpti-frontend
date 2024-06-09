@@ -1,11 +1,41 @@
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Form, Link, useNavigate } from "react-router-dom"
+import { updateInputDateCustomer } from "../../../state/CustomerSlice";
 
 function CustomerTransaction() {
     const userState = useSelector(state => state.user);
     const customerState = useSelector(state => state.customer);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const handleDateInputChange = (event) => {
+        console.log(event.target.value)
+    }
+
+    useEffect(() => {
+        if (customerState.data.nik == null) {
+            return navigate("/pelanggan")
+        }
+        fetch('https://worldtimeapi.org/api/timezone/Asia/Jakarta')
+            .then(response => response.json())
+            .then(data => {
+                dispatch(updateInputDateCustomer(data.datetime.slice(0, 16)))
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        setInterval(() => {
+            fetch('https://worldtimeapi.org/api/timezone/Asia/Jakarta')
+                .then(response => response.json())
+                .then(data => {
+                    dispatch(updateInputDateCustomer(data.datetime.slice(0, 16)))
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }, 60000)
+    }, [])
     return (
         <div className="w-full py-2">
             <div className="flex justify-start">
@@ -21,14 +51,11 @@ function CustomerTransaction() {
             </div>
 
 
-
-
-
             <Form className="grid gap-3">
                 <div className="card max-w-5xl bg-base-100 shadow-xl overflow-x-auto">
                     <div className="card-body ">
                         <h2 className="card-title">Tanggal</h2>
-                        <input type="datetime-local" className="input" />
+                        <input onChange={handleDateInputChange} value={customerState.data.tanggal} disabled type="datetime-local" className="input" />
                     </div>
                 </div>
 

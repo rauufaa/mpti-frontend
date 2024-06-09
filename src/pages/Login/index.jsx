@@ -51,7 +51,7 @@ function Login() {
     }, [userState.error])
 
     useEffect(()=>{
-        if( userState.data ){
+        if( userState.data.token != null || undefined ){
             navigate("/");
         }
     }, [])
