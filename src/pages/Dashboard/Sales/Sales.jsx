@@ -98,15 +98,16 @@ function Sales() {
     const excelExport = (result) => {
         // console.log([...stokState?.dataPrint.map((data, index)=>[index++, data.nama_penginput, data.nama_gas, data.jumlah, data.tanggal, data.informasi])])
         //console.log(result)
-        const fileName = 'apidata';
+        const fileName = 'penjualan';
         const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
         const fileExtension = ".xlsx";
+        console.log(result.dataSold.revenue)
         const Heading = [
-            [`Total Terjual : ${result.dataSold.countSold}`],
-            [`Total Keuntungan : ${result.dataSold.revenue}`],
+            [`Total Terjual : `,result.dataSold.countSold],
+            [`Total Keuntungan : `, result.dataSold.revenue],
             ['No', 'Nama', 'Tanggal', 'Jumlah', 'Harga Satuan', 'Total', 'Penginput']
         ];
-        const ws = XLSX.utils.json_to_sheet(result.data.map((data, index)=>[index+1, data.nama_penginput, data.nama_gas, data.jumlah, data.tanggal, data.informasi]), { origin: 'A2'});
+        const ws = XLSX.utils.json_to_sheet(result.data.map((data, index)=>[index+1, data.nama_pembeli, data.tanggal, data.jumlah, data.hargaSatuan, data.totalBayar, data.nama_penginput]), { origin: 'A3'});
         XLSX.utils.sheet_add_aoa(ws, Heading, { origin: 'A1' });
         const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
         const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });

@@ -27,6 +27,8 @@ export const getSales = createAsyncThunk(
             if (error.response) {
                 const message = error.response.data.errors;
                 return thunkAPI.rejectWithValue(message)
+            }else{
+                return thunkAPI.rejectWithValue("Network error")
             }
         }
     }
@@ -55,6 +57,8 @@ export const getAllHistorySales = createAsyncThunk(
             if (error.response) {
                 const message = error.response.data.errors;
                 return thunkAPI.rejectWithValue(message)
+            }else{
+                return thunkAPI.rejectWithValue("Network error")
             }
         }
     }

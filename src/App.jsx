@@ -3,8 +3,8 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import Login from './pages/Login'
-import Dashboard from './pages/Dashboard'
+import Login, { actionLogin } from './pages/Login'
+import Dashboard, { actionDashboard } from './pages/Dashboard'
 import Customer from './pages/Dashboard/Customer/Customer'
 import CustomerRegister from './pages/Dashboard/Customer/CustomerRegister'
 import CustomerTransaction from './pages/Dashboard/Customer/CustomerTransaction'
@@ -20,12 +20,14 @@ import ForgetPassword from './pages/ForgetPassword'
 const router = createBrowserRouter([
   {
     path: "/login",
+    loader: actionLogin,
     element: <Login />
   }, {
     path: "/lupa-sandi",
     element: <ForgetPassword/>
   },{
     path: "/",
+    loader: actionDashboard,
     element: <Dashboard />,
     children: [
       {

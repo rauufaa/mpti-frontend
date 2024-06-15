@@ -24,6 +24,37 @@ export const addStok = createAsyncThunk(
             if(error.response){
                 const message = error.response.data.errors;
                 return thunkAPI.rejectWithValue(message)
+            }else{
+                return thunkAPI.rejectWithValue("Network error")
+            }
+        }
+    }
+)
+
+export const updatePriceStok = createAsyncThunk(
+    "gas/update",
+    async (data, thunkAPI) => {
+        const prepData = JSON.stringify({
+            inputDate: data.inputDate,
+            priceBuy: data.priceBuy,
+            priceSell: data.priceSell
+        })
+        try {
+            const response = await axios.post("http://localhost:3000/gas/update", prepData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': data.token
+                },
+            });
+            const result = await response.data;
+            console.log(result)
+            return result;
+        } catch (error) {
+            if(error.response){
+                const message = error.response.data.errors;
+                return thunkAPI.rejectWithValue(message)
+            }else{
+                return thunkAPI.rejectWithValue("Network error")
             }
         }
     }
@@ -59,6 +90,8 @@ export const historyStok = createAsyncThunk(
             if(error.response){
                 const message = error.response.data.errors;
                 return thunkAPI.rejectWithValue(message)
+            }else{
+                return thunkAPI.rejectWithValue("Network error")
             }
         }
     }
@@ -92,6 +125,70 @@ export const downloadHistoryStok = createAsyncThunk(
             if(error.response){
                 const message = error.response.data.errors;
                 return thunkAPI.rejectWithValue(message)
+            }else{
+                return thunkAPI.rejectWithValue("Network error")
+            }
+        }
+    }
+)
+
+export const gasStok = createAsyncThunk(
+    "gas/stok",
+    async (data, thunkAPI) => {
+        // const prepData = JSON.stringify({
+        //     inputDate: data.inputDate,
+        //     countStok: data.countStok,
+        //     information: data.information
+        // })
+        console.log("jalan", data)
+        try {
+            const response = await axios.get("http://localhost:3000/gas/stok", {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': data.token
+                }
+            });
+            const result = await response.data;
+            console.log(result)
+            return result;
+        } catch (error) {
+            console.log(error)
+            if(error.response){
+                const message = error.response.data.errors;
+                return thunkAPI.rejectWithValue(message)
+            }else{
+                return thunkAPI.rejectWithValue("Network error")
+            }
+        }
+    }
+)
+
+export const gasDelete = createAsyncThunk(
+    "gas/delete",
+    async (data, thunkAPI) => {
+        // const prepData = JSON.stringify({
+        //     inputDate: data.inputDate,
+        //     countStok: data.countStok,
+        //     information: data.information
+        // })
+        console.log("jalan", data)
+        try {
+            const response = await axios.delete(`http://localhost:3000/gas/stok/${data.stokId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': data.token
+                }
+            });
+            const result = await response.data;
+            console.log(result)
+            return result;
+        } catch (error) {
+            console.log(error)
+            if(error.response){
+                const message = error.response.data.errors;
+                return thunkAPI.rejectWithValue(message)
+            }else{
+                return thunkAPI.rejectWithValue("Network error")
             }
         }
     }
@@ -108,6 +205,11 @@ const StokSlice = createSlice({
             inputDate: null,
             countStok: 100,
             information: null,
+        },
+        dataStok: {
+            stok: 0,
+            priceBuy: null,
+            priceSell: null,
         },
         historyData: {
             startDate: '',
@@ -148,6 +250,13 @@ const StokSlice = createSlice({
         },
         updateSuccessStok: (state, action) => {
             state.success = action.payload;
+        },
+        updatePriceBuyStok: (state, action) => {
+            state.dataStok.priceBuy = action.payload;
+        }
+        ,
+        updatePriceSellStok: (state, action) => {
+            state.dataStok.priceSale = action.payload;
         }
         
     },
@@ -181,10 +290,55 @@ const StokSlice = createSlice({
         }).addCase(downloadHistoryStok.fulfilled, (state, action)=>{
             state.loading = false;
             state.error = false;
-            state.success = false;
+            state.success = true;
+            state.message = "Berhasil unduh";
             state.dataPrint = action.payload.data;
+        }).addCase(gasStok.fulfilled, (state, action)=>{
+            state.dataStok.stok = action.payload.data.stok;
+            state.dataStok.priceBuy = action.payload.data.hargaBeli;
+            state.dataStok.priceSell = action.payload.data.hargaJual;
+        }).addCase(gasStok.rejected, (state, action)=>{
+            state.dataStok.stok = 0;
+            state.dataStok.priceBuy = 0;
+            state.dataStok.priceSale = 0;
+            state.loading = false;
+            state.success = false;
+            state.error = true;
+            state.message = action.payload;
+        }).addCase(updatePriceStok.pending, (state, action)=>{
+            state.loading = true;
+            state.error = false;
+        }).addCase(updatePriceStok.fulfilled, (state, action)=>{
+            state.loading = false;
+            state.error = false;
+            state.success = true;
+            state.message = action.payload.data;
+        }).addCase(updatePriceStok.rejected,(state, action)=>{
+            state.loading = false;
+            state.error = true;
+            // state.success = false;
+            state.message = action.payload
         })
+        .addCase(gasDelete.pending, (state, action)=>{
+            state.loading = true;
+            state.error = false;
+            // state.success = false;
+            
+        })
+        .addCase(gasDelete.fulfilled, (state, action)=>{
+            state.loading = false;
+            state.error = false;
+            // state.success = false;
+            state.message = action.payload
+        })
+        .addCase(gasDelete.rejected,(state, action)=>{
+            state.loading = false;
+            state.error = true;
+            // state.success = false;
+            state.message = action.payload
+        })
+        
 })
 
-export const {updateSuccessStok, updateInputDateStok, updateCountStok, updateInformationStok, updateErrorStok, updateMessageStok, updateCurrentPageStok, updateStartDateStok, updateEndDateStok} = StokSlice.actions
+export const {updatePriceBuyStok, updatePriceSellStok, updateSuccessStok, updateInputDateStok, updateCountStok, updateInformationStok, updateErrorStok, updateMessageStok, updateCurrentPageStok, updateStartDateStok, updateEndDateStok} = StokSlice.actions
 export default StokSlice.reducer

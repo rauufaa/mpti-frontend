@@ -21,6 +21,7 @@ function CustomerTransaction() {
             .then(response => response.json())
             .then(data => {
                 dispatch(updateInputDateCustomer(data.datetime.slice(0, 16)))
+                console.log("macan")
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -30,6 +31,7 @@ function CustomerTransaction() {
                 .then(response => response.json())
                 .then(data => {
                     dispatch(updateInputDateCustomer(data.datetime.slice(0, 16)))
+                    console.log("macan")
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -55,7 +57,7 @@ function CustomerTransaction() {
                 <div className="card max-w-5xl bg-base-100 shadow-xl overflow-x-auto">
                     <div className="card-body ">
                         <h2 className="card-title">Tanggal</h2>
-                        <input onChange={handleDateInputChange} value={customerState.data.tanggal} disabled type="datetime-local" className="input" />
+                        <input defaultValue={customerState.data.inputDate} disabled type="datetime-local" className="input" />
                     </div>
                 </div>
 
@@ -70,12 +72,12 @@ function CustomerTransaction() {
                             <hr className="my-2 border border-blue-gray-50" />
                             <div className="grid grid-cols-2">
                                 <p>Nama</p>
-                                <p>{customerState.data.nama}</p>
+                                <p>{customerState.data.name}</p>
                             </div>
                             <hr className="my-2 border border-blue-gray-50" />
                             <div className="grid grid-cols-2">
                                 <p>Jenis Subsidi</p>
-                                <p>{customerState.data.tipe}</p>
+                                <p>{customerState.data.type}</p>
                             </div>
                             <hr className="my-2 border border-blue-gray-50" />
 

@@ -1,7 +1,27 @@
 import React, { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { NavLink, Outlet, redirect, useNavigate } from 'react-router-dom'
 import { updateSuccessStok } from '../../state/StokSlice';
+import axios from 'axios';
+
+
+export async function actionDashboard() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    
+    try {
+        console.log("sfasd")
+        const response = await axios.get("http://localhost:3000/", {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": user?.token
+            }
+        })
+        const result = await response.data;
+        return null
+    } catch (error) {
+        return redirect("/login");
+    }
+}
 
 function Dashboard() {
     const drawerRef = useRef(null);
@@ -10,10 +30,11 @@ function Dashboard() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     useEffect(() => {
-        if (userState.data.token == null || undefined) {
-            navigate("/login");
-        }
-        console.log("dahsbor")
+        document.title = "Pangkalan LPG Egi Rahayu - Dashboard"
+        // if (userState?.data?.token == null || undefined) {
+        //     navigate("/login");
+        // }
+        // console.log("dahsbor")
     }, [])
 
     useEffect(() => {
@@ -144,6 +165,7 @@ function Dashboard() {
                     </div>
                 </div>
             }
+            
         </>
     )
 }

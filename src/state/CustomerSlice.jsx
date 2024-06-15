@@ -14,12 +14,16 @@ export const customerCheckNik = createAsyncThunk(
                     'Authorization': data.token
                 },
             });
+            
             const result = await response.data;
+            console.log(response)
             return result;
         } catch (error) {
             if(error.response){
                 const message = error.response.data.errors;
                 return thunkAPI.rejectWithValue(message)
+            }else{
+                return thunkAPI.rejectWithValue("Network error")
             }
         }
 
@@ -58,7 +62,7 @@ const CustomerSlice = createSlice({
             state.message = action.payload
         },
         updateNameCustomer: (state, action)=> {
-            state.data.namw = action.payload
+            state.data.name = action.payload
         },
         updateAddressCustomer: (state, action)=> {
             state.data.address = action.payload
@@ -81,9 +85,9 @@ const CustomerSlice = createSlice({
                 state.loading = false
                 state.error = false
                 // console.log(action)
-                // state.data.nik = action.payload.data.nik
-                // state.data.name = action.payload.data.nama
-                // state.data.type = action.payload.data.tipe
+                state.data.nik = action.payload.data.nik
+                state.data.name = action.payload.data.nama
+                state.data.type = action.payload.data.tipe
             })
             .addCase(customerCheckNik.rejected, (state, action) => {
                 state.loading = false;

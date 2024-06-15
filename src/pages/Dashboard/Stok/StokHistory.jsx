@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Form, Link, useNavigate } from "react-router-dom"
-import { downloadHistoryStok, historyStok, updateCurrentPageStok, updateEndDateStok, updateStartDateStok, updateSuccessStok } from "../../../state/StokSlice";
+import { downloadHistoryStok, historyStok, updateCurrentPageStok, updateEndDateStok, updateErrorStok, updateStartDateStok, updateSuccessStok } from "../../../state/StokSlice";
 import FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
 
@@ -83,6 +83,14 @@ function StokHistory() {
         dispatch(historyStok(dataPrep))
     }
 
+    const handleDeleteStok = (id) => {
+        const dataPrep = {
+            token: userState.data.token,
+            stokId: id
+        }
+        
+    }
+
     const excelExport = (result) => {
         // console.log([...stokState?.dataPrint.map((data, index)=>[index++, data.nama_penginput, data.nama_gas, data.jumlah, data.tanggal, data.informasi])])
         //console.log(result)
@@ -90,7 +98,6 @@ function StokHistory() {
         const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
         const fileExtension = ".xlsx";
         const Heading = [
-            ['yayayay'],
             ['No', 'Penginput', 'Jenis Gas', 'Jumlah', 'Tanggal', 'Informasi']
         ];
         const ws = XLSX.utils.json_to_sheet(result.data.map((data, index)=>[index+1, data.nama_penginput, data.nama_gas, data.jumlah, data.tanggal, data.informasi]), { origin: 'A2'});
@@ -100,6 +107,14 @@ function StokHistory() {
         const filedata = new Blob([excelBuffer], { type: fileType });
         FileSaver.saveAs(filedata, fileName + fileExtension);
     }
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (stokState.error) {
+                dispatch(updateErrorStok(false))
+            }
+        }, 5000)
+        return () => clearTimeout(timer)
+    }, [stokState.error])
 
     return (
         <div className="w-full py-2">
@@ -114,6 +129,14 @@ function StokHistory() {
                     <p className="text-[1.2em]">Riwayat Perubahan Stok LPG 3Kg</p>
                 </div>
             </div>
+            {
+                stokState.error && (
+                    <div role="alert" className="alert alert-error transition-all ease-in">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <span>{stokState.message}</span>
+                    </div>
+                )
+            }
             <div className="grid gap-3">
                 <div className="card bg-base-100 shadow-xl overflow-x-auto max-w-5xl ">
                     <Form className="card-body gap-4 flex-col" onSubmit={handleSubmitSearchHistory}>
@@ -176,9 +199,9 @@ function StokHistory() {
                                                         <td>{data.informasi}</td>
                                                         <td>{data.nama_penginput}</td>
                                                         <td>
-                                                            <button className="btn btn-ghost btn-circle">
+                                                            <button onClick={()=>handleDeleteStok(data.id)} className="btn btn-ghost btn-circle">
                                                                 <span className="material-symbols-outlined">
-                                                                    edit
+                                                                    delete
                                                                 </span>
                                                             </button>
                                                         </td>

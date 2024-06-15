@@ -22,6 +22,8 @@ export const forgetPasswordSendEmail = createAsyncThunk(
             if(error.response){
                 const message = error.response.data.errors;
                 return thunkAPI.rejectWithValue(message)
+            }else{
+                return thunkAPI.rejectWithValue("Network error")
             }
         }
     }
@@ -48,6 +50,8 @@ export const forgetPasswordSendCode = createAsyncThunk(
             if(error.response){
                 const message = error.response.data.errors;
                 return thunkAPI.rejectWithValue(message)
+            }else{
+                return thunkAPI.rejectWithValue("Network error")
             }
         }
     }
@@ -76,6 +80,8 @@ export const forgetPasswordSendNewPass = createAsyncThunk(
             if(error.response){
                 const message = error.response.data.errors;
                 return thunkAPI.rejectWithValue(message)
+            }else{
+                return thunkAPI.rejectWithValue("Network error")
             }
         }
     }

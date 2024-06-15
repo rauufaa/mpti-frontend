@@ -1,7 +1,27 @@
 import { useDispatch, useSelector } from "react-redux"
-import { Form, Link, useNavigate } from "react-router-dom"
+import { Form, Link, redirect, useNavigate } from "react-router-dom"
 import { loginUser, updateErrorUser, updateMessageUser, updatePasswordUser, updateUsernameUser } from "../../state/UserSlice";
 import { useEffect } from "react";
+import axios from "axios";
+
+
+export async function actionLogin() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    
+    try {
+        console.log("sfasd")
+        const response = await axios.get("http://localhost:3000/", {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": user?.token
+            }
+        })
+        const result = await response.data;
+        return redirect("/")
+    } catch (error) {
+        return null;
+    }
+}
 
 function Login() {
     const userState = useSelector(state => state.user);
@@ -50,10 +70,11 @@ function Login() {
         return () => clearTimeout(timer)
     }, [userState.error])
 
-    useEffect(()=>{
-        if( userState.data.token != null || undefined ){
-            navigate("/");
-        }
+    useEffect(() => {
+        document.title = "Pangkalan LPG Egi Rahayu - Login"
+        // if (userState?.data?.token != null || undefined) {
+        //     navigate("/");
+        // }
     }, [])
 
     return (
